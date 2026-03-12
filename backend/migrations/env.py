@@ -13,8 +13,9 @@ from app.models import User, Resource, Booking  # noqa: import all models
 
 config = context.config
 
-# Override URL from env
-db_url = os.getenv("DATABASE_URL_SYNC", config.get_main_option("sqlalchemy.url"))
+# Override URL from env — handle Render's postgres:// format
+from app.core.config import settings
+db_url = settings.sync_database_url
 config.set_main_option("sqlalchemy.url", db_url)
 
 if config.config_file_name is not None:
