@@ -88,6 +88,17 @@ jobs:
       - name: Verify containers start
         run: |
           docker compose up -d
-          sleep 10
-          curl -f http://localhost:8000/health || exit 1
+          echo "Waiting for services to start..."
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:8002/health > /dev/null 2>&1; then
+              echo "Backend is healthy!"
+              docker compose down
+              exit 0
+            fi
+            echo "Attempt $i/30 - waiting..."
+            sleep 5
+          done
+          echo "Backend failed to start"
+          docker compose logs backend
           docker compose down
+          exit 1
